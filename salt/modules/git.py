@@ -23,6 +23,8 @@ import salt.utils.platform
 import salt.utils.stringutils
 import salt.utils.templates
 import salt.utils.url
+import salt.utils.platform
+import salt.utils.mac_utils
 from salt.exceptions import SaltInvocationError, CommandExecutionError
 from salt.utils.versions import LooseVersion as _LooseVersion
 from salt.ext import six
@@ -41,8 +43,12 @@ def __virtual__():
     if salt.utils.path.which('git') is None:
         return (False,
                 'The git execution module cannot be loaded: git unavailable.')
-    else:
-        return True
+    if salt.utils.platform.is_darwin():
+        if not salt.utils.mac_utils.real_git():
+            return (False,
+                    'git is just a stub on macOS, please install Xcode'
+                    'or the Command Line Tools to use git.')
+    return True
 
 
 def _check_worktree_support(failhard=True):

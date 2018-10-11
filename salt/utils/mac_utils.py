@@ -390,3 +390,18 @@ def available_services(refresh=False):
     '''
     log.debug('Loading available services')
     return _available_services(refresh)
+
+
+def real_git():
+    '''
+    Returns whether or not ``/usr/bin/git`` is more than just a stub.
+
+     .. note::
+        By default on macOS ``/usr/bin/git`` is just a stub to a git that comes
+        with either the Command Line Tools or Xcode.
+    '''
+    cmd = '/usr/bin/xcode-select -p'
+    try:
+        return __salt__['cmd.run_stdout'](cmd, ignore_retcode=True)
+    except CommandExecutionError:
+        return False
