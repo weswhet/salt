@@ -455,6 +455,18 @@ def running(name,
     if salt.utils.platform.is_windows() and kwargs.get('timeout', False):
         start_kwargs.update({'timeout': kwargs.get('timeout')})
 
+    # macOS services cannot be started if they are disabled. So they need
+    # to be enabled prior to starting, otherwise we will always fail.
+    if salt.utils.platform.is_darwin() and not before_toggle_enable_status:
+        if not enable:
+            ret['comment'] = 'Service {0} is disabled and cannot be started '\
+                             'until it is enabled, please set '\
+                             'enable: True.'.format(name)
+            ret['result'] = False
+            return ret
+
+        ret.update(_enable(name, False, **kwargs))
+
     try:
         func_ret = __salt__['service.start'](name, **start_kwargs)
     except CommandExecutionError as exc:
