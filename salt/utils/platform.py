@@ -4,6 +4,7 @@ Functions for identifying which platform a machine is
 """
 from __future__ import absolute_import, print_function, unicode_literals
 
+import multiprocessing
 import os
 import subprocess
 import sys
@@ -177,3 +178,13 @@ def is_fedora():
         x.strip('"').strip("'") for x in linux_distribution()
     ]
     return osname == "Fedora"
+
+
+@real_memoize
+def spanwing_platform():
+    """
+    Returns True if multiprocessing.get_start_method(allow_none=False) returns "spawn"
+
+    This is the default for Windows and macOS on Python >= 3.4
+    """
+    return multiprocessing.get_start_method(allow_none=False) == "spawn"
