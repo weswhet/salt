@@ -53,5 +53,9 @@ class SSHTest(SSHCase):
         make sure to clean up any old ssh directories
         """
         salt_dir = self.run_function("config.get", ["thin_dir"], wipe=False)
+        if not isinstance(salt_dir, str):
+            raise AssertionError(
+                "config.get thin_dir did not return a string: {}".format(salt_dir)
+            )
         if os.path.exists(salt_dir):
             shutil.rmtree(salt_dir)
