@@ -275,10 +275,6 @@ def _run_with_coverage(session, *test_cmd):
         # Instruct sub processes to also run under coverage
         "COVERAGE_PROCESS_START": os.path.join(REPO_ROOT, ".coveragerc"),
     }
-    if IS_DARWIN:
-        # Don't nuke our multiprocessing efforts objc!
-        # https://stackoverflow.com/questions/50168647/multiprocessing-causes-python-to-crash-and-gives-an-error-may-have-been-in-progr
-        env["OBJC_DISABLE_INITIALIZE_FORK_SAFETY"] = "YES"
 
     try:
         session.run(*test_cmd, env=env)
@@ -326,12 +322,7 @@ def _runtests(session, coverage, cmd_args):
             )
         else:
             cmd_args = ["python", os.path.join("tests", "runtests.py")] + list(cmd_args)
-            env = None
-            if IS_DARWIN:
-                # Don't nuke our multiprocessing efforts objc!
-                # https://stackoverflow.com/questions/50168647/multiprocessing-causes-python-to-crash-and-gives-an-error-may-have-been-in-progr
-                env = {"OBJC_DISABLE_INITIALIZE_FORK_SAFETY": "YES"}
-            session.run(*cmd_args, env=env)
+            session.run(*cmd_args)
     except CommandFailed:  # pylint: disable=try-except-raise
         # Disabling re-running failed tests for the time being
         raise
@@ -786,27 +777,13 @@ def _pytest(session, coverage, cmd_args):
     # Create required artifacts directories
     _create_ci_directories()
 
-    env = None
-    if IS_DARWIN:
-        # Don't nuke our multiprocessing efforts objc!
-        # https://stackoverflow.com/questions/50168647/multiprocessing-causes-python-to-crash-and-gives-an-error-may-have-been-in-progr
-        env = {"OBJC_DISABLE_INITIALIZE_FORK_SAFETY": "YES"}
-
-    if CI_RUN:
-        # We'll print out the collected tests on CI runs.
-        # This will show a full list of what tests are going to run, in the right order, which, in case
-        # of a test suite hang, helps us pinpoint which test is hanging
-        session.run(
-            "python", "-m", "pytest", *(cmd_args + ["--collect-only", "-qqq"]), env=env
-        )
-
     try:
         if coverage is True:
             _run_with_coverage(
                 session, "python", "-m", "coverage", "run", "-m", "pytest", *cmd_args
             )
         else:
-            session.run("python", "-m", "pytest", *cmd_args, env=env)
+            session.run("python", "-m", "pytest", *cmd_args)
     except CommandFailed:  # pylint: disable=try-except-raise
         # Not rerunning failed tests for now
         raise
@@ -824,7 +801,7 @@ def _pytest(session, coverage, cmd_args):
                 session, "python", "-m", "coverage", "run", "-m", "pytest", *cmd_args
             )
         else:
-            session.run("python", "-m", "pytest", *cmd_args, env=env)
+            session.run("python", "-m", "pytest", *cmd_args)
         # pylint: enable=unreachable
 
 
