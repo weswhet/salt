@@ -12,6 +12,7 @@ import tarfile
 import tempfile
 
 import jinja2
+import pytest
 import salt.exceptions
 import salt.ext.six
 import salt.utils.hashutils
@@ -26,13 +27,7 @@ from tests.support.mock import MagicMock, patch
 from tests.support.runtests import RUNTIME_VARS
 from tests.support.unit import TestCase, skipIf
 
-try:
-    import pytest
-except ImportError:
-    pytest = None
 
-
-@skipIf(pytest is None, "PyTest is missing")
 class SSHThinTestCase(TestCase):
     """
     TestCase for SaltSSH-related parts.
@@ -144,6 +139,7 @@ class SSHThinTestCase(TestCase):
     @patch("salt.exceptions.SaltSystemExit", Exception)
     @patch("salt.utils.thin.log", MagicMock())
     @patch("salt.utils.thin.os.path.isfile", MagicMock(return_value=False))
+    @skipIf(not RUNTIME_VARS.PYTEST_SESSION, "Test relies on pytest specific features")
     def test_get_ext_tops_cfg_missing_dependencies(self):
         """
         Test thin.get_ext_tops contains all required dependencies.
@@ -162,6 +158,7 @@ class SSHThinTestCase(TestCase):
     @patch("salt.exceptions.SaltSystemExit", Exception)
     @patch("salt.utils.thin.log", MagicMock())
     @patch("salt.utils.thin.os.path.isfile", MagicMock(return_value=False))
+    @skipIf(not RUNTIME_VARS.PYTEST_SESSION, "Test relies on pytest specific features")
     def test_get_ext_tops_cfg_missing_interpreter(self):
         """
         Test thin.get_ext_tops contains interpreter configuration.
@@ -176,6 +173,7 @@ class SSHThinTestCase(TestCase):
     @patch("salt.exceptions.SaltSystemExit", Exception)
     @patch("salt.utils.thin.log", MagicMock())
     @patch("salt.utils.thin.os.path.isfile", MagicMock(return_value=False))
+    @skipIf(not RUNTIME_VARS.PYTEST_SESSION, "Test relies on pytest specific features")
     def test_get_ext_tops_cfg_wrong_interpreter(self):
         """
         Test thin.get_ext_tops contains correct interpreter configuration.
@@ -194,6 +192,7 @@ class SSHThinTestCase(TestCase):
     @patch("salt.exceptions.SaltSystemExit", Exception)
     @patch("salt.utils.thin.log", MagicMock())
     @patch("salt.utils.thin.os.path.isfile", MagicMock(return_value=False))
+    @skipIf(not RUNTIME_VARS.PYTEST_SESSION, "Test relies on pytest specific features")
     def test_get_ext_tops_cfg_interpreter(self):
         """
         Test thin.get_ext_tops interpreter configuration.
@@ -230,6 +229,7 @@ class SSHThinTestCase(TestCase):
     @patch("salt.exceptions.SaltSystemExit", Exception)
     @patch("salt.utils.thin.log", MagicMock())
     @patch("salt.utils.thin.os.path.isfile", MagicMock(return_value=False))
+    @skipIf(not RUNTIME_VARS.PYTEST_SESSION, "Test relies on pytest specific features")
     def test_get_ext_tops_dependency_config_check(self):
         """
         Test thin.get_ext_tops dependencies are importable
@@ -367,6 +367,7 @@ class SSHThinTestCase(TestCase):
         assert thin._get_ext_namespaces(cfg).get("ns") == (2, 7,)
         assert isinstance(thin._get_ext_namespaces(cfg).get("ns"), tuple)
 
+    @skipIf(not RUNTIME_VARS.PYTEST_SESSION, "Test relies on pytest specific features")
     def test_get_ext_namespaces_failure(self):
         """
         Test thin._get_ext_namespaces function raises an exception
@@ -665,6 +666,7 @@ class SSHThinTestCase(TestCase):
 
     @patch("salt.utils.thin.sys.version_info", (2, 5))
     @patch("salt.exceptions.SaltSystemExit", Exception)
+    @skipIf(not RUNTIME_VARS.PYTEST_SESSION, "Test relies on pytest specific features")
     def test_gen_thin_fails_ancient_python_version(self):
         """
         Test thin.gen_thin function raises an exception
