@@ -270,6 +270,23 @@ echo -n -e "\033]0;Build_Env: Python: make install\007"
 $MAKE install
 
 ################################################################################
+# Download and install pyobjc
+################################################################################
+echo -n -e "\033]0;Build_Env: PyObjC: download\007"
+
+PKGURL="https://github.com/ronaldoussoren/pyobjc/archive/refs/tags/v6.2.2.tar.gz"
+PKGDIR="pyobjc-v6.2.2"
+
+download $PKGURL
+
+echo "################################################################################"
+echo "Building pyobjc"
+echo "################################################################################"
+cd $PKGDIR
+
+$PYTHON install.py
+
+################################################################################
 # upgrade pip
 ################################################################################
 $PIP install --upgrade pip wheel
